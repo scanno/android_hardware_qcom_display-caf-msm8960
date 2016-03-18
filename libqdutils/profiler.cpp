@@ -59,8 +59,22 @@ void CalcFps::Init() {
 }
 
 void CalcFps::Fps() {
-    if (debug_fps_level > 0)
+    unsigned int current_level = debug_fps_level;
+    char prop[PROPERTY_VALUE_MAX];
+    property_get("debug.gr.calcfps", prop, "0");
+    debug_fps_level = atoi(prop);
+    if (debug_fps_level > MAX_DEBUG_FPS_LEVEL) {
+        ALOGW("out of range value for debug.gr.calcfps, using 0");
+        debug_fps_level = 0;
+    }
+
+    if (debug_fps_level > 0) {
+        if (current_level != debug_fps_level) {
+            ALOGD("DEBUG_CALC_FPS: %d", debug_fps_level);
+            populate_debug_fps_metadata();
+        }
         calc_fps(ns2us(systemTime()));
+    }
 }
 
 void CalcFps::populate_debug_fps_metadata(void)
