@@ -390,7 +390,15 @@ static int hwc_blank(struct hwc_composer_device_1* dev, int dpy, int blank)
         }
 
         ctx->dpyAttr[dpy].isActive = !blank;
-        if(ctx->mAutomotiveModeOn) {
+        if(!ctx->mFirstPowerOnCompleted && ctx->mAutomotiveModeOn) {
+            // For the non-primary displays, if we report back valid display
+            // attributes (which is the case for automotive), then surface
+            // flinger will treat it as unblanked already, hence no blank
+            // call will be made from SF. So, for first blank call, we set
+            // isActive is same as primary for non-primary displays. But
+            // subsequently, we should let each display handles its own flag.
+            // Because subsequent blank call will be made for each display.
+            ctx->mFirstPowerOnCompleted = true;
             ctx->dpyAttr[HWC_DISPLAY_SECONDARY].isActive = !blank;
             ctx->dpyAttr[HWC_DISPLAY_TERTIARY].isActive = !blank;
         }

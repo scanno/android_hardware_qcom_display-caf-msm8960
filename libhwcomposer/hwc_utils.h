@@ -509,6 +509,8 @@ struct hwc_context_t {
     bool mMDPArbSuppport;
     // flag to enable/disable KPI logs
     qhwc::KPILog mKpiLog;
+    // Track if the power on call is the first one from the system.
+    bool mFirstPowerOnCompleted;
 };
 
 namespace qhwc {
